@@ -29,6 +29,6 @@ abstract class ParamHandler
         return new TextParamHandler($filename);
     }
 
-    abstract public function write(): bool
-    abstract public function read(): bool
+    abstract public function write(): bool;
+    abstract public function read(): bool;
 }
