@@ -20,18 +20,26 @@ class Minion extends Employee
     }
 }
 
+class CluedUp extends Employee
+{
+    public function fire()
+    {
+        print "{$this->name}: I'll call my lawyer." . PHP_EOL;
+    }
+}
+
 class NastyBoss
 {
     private $employees = [];
 
-    public function addEmployee(string $employeeName)
+    public function addEmployee(Employee $employee)
     {
-        $this->employees[] = new Minion($employeeName);
+        $this->employees[] = $employee;
     }
 
     public function projectFails()
     {
-        if (count($this->employees) > 0) {
+        if (count($this->employees)) {
             $emp = array_pop($this->employees);
             $emp->fire();
         }
@@ -39,9 +47,11 @@ class NastyBoss
 }
 
 $boss = new NastyBoss();
-$boss->addEmployee("Harry");
-$boss->addEmployee("Bob");
-$boss->addEmployee("Mary");
-$boss->addEmployee("Gene");
+$boss->addEmployee(new Minion('Harry'));
+$boss->addEmployee(new CluedUp('Bob'));
+$boss->addEmployee(new Minion('Mary'));
+$boss->addEmployee(new CluedUp('Gene'));
 
+$boss->projectFails();
+$boss->projectFails();
 $boss->projectFails();
