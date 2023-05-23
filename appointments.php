@@ -5,6 +5,13 @@ abstract class ApptEncoder
     abstract public function encode(): string;
 }
 
+abstract class CommsManager
+{
+    abstract public function getApptEncoder(): ApptEncoder;
+    abstract public function getHeaderText(): string;
+    abstract public function getFooterText(): string;
+}
+
 class BloggsApptEncoder extends ApptEncoder
 {
     public function encode(): string 
@@ -21,31 +28,47 @@ class MegaApptEncoder extends ApptEncoder
     }
 }
 
-class CommsManager {
-    const BLOGGS = 1;
-    const MEGA   = 2;
-    private $mode;
-
-    public function __construct(int $mode)
-    {
-        $this->mode = $mode;
-    } 
-
+class BloggsCommsManager extends CommsManager {
     public function getApptEncoder(): ApptEncoder
     {
-        switch ($this->mode) {
-            case (self::MEGA):
-                return new MegaApptEncoder();
-                break;
-            default:
-                return new BloggsApptEncoder();
-                break;
-        }
+        return new BloggsApptEncoder();
+    }
+
+    public function getHeaderText(): string 
+    {
+        return 'BloggsCal header' . PHP_EOL;
+    }
+
+    public function getFooterText(): string 
+    {
+        return 'BloggsCal footer' . PHP_EOL;
     }
 }
 
-$man = new CommsManager(CommsManager::MEGA);
-print (get_class($man->getApptEncoder())) . PHP_EOL;
+class MegaCommsManager extends CommsManager
+{
+    public function getApptEncoder(): ApptEncoder
+    {
+        return new MegaApptEncoder();
+    }
 
-$man = new CommsManager(CommsManager::BLOGGS);
-print (get_class($man->getApptEncoder())) . PHP_EOL;
+    public function getHeaderText(): string 
+    {
+        return 'MegaCal header' . PHP_EOL;
+    }
+
+    public function getFooterText(): string 
+    {
+        return 'MegaCal footer' . PHP_EOL;
+    }
+}
+
+$bloggsMgr = new BloggsCommsManager();
+print $bloggsMgr->getHeaderText();
+print $bloggsMgr->getApptEncoder()->encode();
+print $bloggsMgr->getFooterText();
+
+$megaMgr = new MegaCommsManager();
+print $megaMgr->getHeaderText();
+print $megaMgr->getApptEncoder()->encode();
+print $megaMgr->getFooterText();
