@@ -1,74 +1,144 @@
 <?php
 
-abstract class ApptEncoder
+abstract class AppointmentEncoder
 {
     abstract public function encode(): string;
 }
 
-abstract class CommsManager
+abstract class ThingsToDoEncoder
 {
-    abstract public function getApptEncoder(): ApptEncoder;
+    abstract public function encode(): string;
+}
+
+abstract class ContactEncoder
+{
+    abstract public function encode(): string;
+}
+
+abstract class CommunicationsManager
+{
+    abstract public function getAppointmentEncoder(): AppointmentEncoder;
+    abstract public function getTtdEncoder(): ThingsToDoEncoder;
+    abstract public function getContactEncoder(): ContactEncoder;
     abstract public function getHeaderText(): string;
     abstract public function getFooterText(): string;
 }
 
-class BloggsApptEncoder extends ApptEncoder
+class BlogAppointmentEncoder extends AppointmentEncoder
 {
     public function encode(): string 
     {
-        return 'Appointment data encoded in BloggsCal format' . PHP_EOL;
+        return 'Blog Calendar: Appointment data encoded' . PHP_EOL;
     }
 }
 
-class MegaApptEncoder extends ApptEncoder
+class MegaAppointmentEncoder extends AppointmentEncoder
 {
     public function encode(): string
     {
-        return 'Appointment data encoded in MegaCal format' . PHP_EOL;
+        return 'Mega Calendar: Appointment data encoded' . PHP_EOL;
     }
 }
 
-class BloggsCommsManager extends CommsManager {
-    public function getApptEncoder(): ApptEncoder
+class BlogCommunicationsEncoder extends CommunicationsManager {
+    public function getAppointmentEncoder(): AppointmentEncoder
     {
-        return new BloggsApptEncoder();
+        return new BlogAppointmentEncoder();
+    }
+
+    public function getTtdEncoder(): ThingsToDoEncoder
+    {
+        return new BlogThingsToDoEncoder();
+    }
+
+    public function getContactEncoder(): ContactEncoder
+    {
+        return new BlogContactEncoder();
     }
 
     public function getHeaderText(): string 
     {
-        return 'BloggsCal header' . PHP_EOL;
+        return 'Blog Calendar: HEADER' . PHP_EOL;
     }
 
     public function getFooterText(): string 
     {
-        return 'BloggsCal footer' . PHP_EOL;
+        return 'Blog Calendar: FOOTER' . PHP_EOL;
     }
 }
 
-class MegaCommsManager extends CommsManager
+class MegaCommunicationsManager extends CommunicationsManager
 {
-    public function getApptEncoder(): ApptEncoder
+    public function getAppointmentEncoder(): AppointmentEncoder
     {
-        return new MegaApptEncoder();
+        return new MegaAppointmentEncoder();
+    }
+
+    public function getTtdEncoder(): ThingsToDoEncoder
+    {
+        return new MegaTtdEncoder();
+    }
+
+    public function getContactEncoder(): ContactEncoder
+    {
+        return new MegaContactEncoder();
     }
 
     public function getHeaderText(): string 
     {
-        return 'MegaCal header' . PHP_EOL;
+        return 'Mega Calendar: HEADER' . PHP_EOL;
     }
 
     public function getFooterText(): string 
     {
-        return 'MegaCal footer' . PHP_EOL;
+        return 'Mega Calendar: FOOTER' . PHP_EOL;
     }
 }
 
-$bloggsMgr = new BloggsCommsManager();
-print $bloggsMgr->getHeaderText();
-print $bloggsMgr->getApptEncoder()->encode();
-print $bloggsMgr->getFooterText();
+class BlogThingsToDoEncoder extends ThingsToDoEncoder
+{
+    public function encode():string
+    {
+        return 'Blog ThingsToDo: encoded' . PHP_EOL;
+    }
+}
 
-$megaMgr = new MegaCommsManager();
-print $megaMgr->getHeaderText();
-print $megaMgr->getApptEncoder()->encode();
-print $megaMgr->getFooterText();
+class MegaTtdEncoder extends ThingsToDoEncoder
+{
+    public function encode():string
+    {
+        return 'Mega ThingsToDo: encoded' . PHP_EOL;
+    }
+}
+
+class BlogContactEncoder extends ContactEncoder
+{
+    public function encode(): string
+    {
+        return 'Blog Contact: encoded' . PHP_EOL;
+    }
+}
+
+class MegaContactEncoder extends ContactEncoder
+{
+    public function encode(): string
+    {
+        return 'Mega Contact: encoded' . PHP_EOL;
+    }
+}
+
+$blogManager = new BlogCommunicationsEncoder();
+print $blogManager->getHeaderText();
+print $blogManager->getAppointmentEncoder()->encode();
+print $blogManager->getTtdEncoder()->encode();
+print $blogManager->getContactEncoder()->encode();
+print $blogManager->getFooterText();
+
+print PHP_EOL;
+
+$megaManager = new MegaCommunicationsManager();
+print $megaManager->getHeaderText();
+print $megaManager->getAppointmentEncoder()->encode();
+print $megaManager->getTtdEncoder()->encode();
+print $megaManager->getContactEncoder()->encode();
+print $megaManager->getFooterText();
