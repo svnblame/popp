@@ -1,5 +1,47 @@
 <?php
 
+class AppointmentSettings
+{
+    public static $COMSTYPE = 'Blog';
+}
+
+class AppointmentConfig
+{
+    private static $instance;
+    private $commsManager;
+
+    private function __construct()
+    {
+        // will run only once
+        $this->init();
+    }
+
+    private function init()
+    {
+        switch (AppointmentSettings::$COMSTYPE) {
+            case 'Mega';
+                $this->commsManager = new MegaCommunicationsManager();
+                break;
+            default:
+                $this->commsManager = new BlogCommunicationsManager();
+        }
+    }
+
+    public static function getInstance(): AppointmentConfig
+    {
+        if (empty(self::$instance)) {
+            self::$instance = new self;
+        }
+
+        return self::$instance;
+    }
+
+    public function getCommunicationsManager(): CommunicationsManager
+    {
+        return $this->commsManager;
+    }
+}
+
 abstract class AppointmentEncoder
 {
     abstract public function encode(): string;
@@ -40,7 +82,7 @@ class MegaAppointmentEncoder extends AppointmentEncoder
     }
 }
 
-class BlogCommunicationsEncoder extends CommunicationsManager {
+class BlogCommunicationsManager extends CommunicationsManager {
     public function getAppointmentEncoder(): AppointmentEncoder
     {
         return new BlogAppointmentEncoder();
@@ -127,18 +169,19 @@ class MegaContactEncoder extends ContactEncoder
     }
 }
 
-$blogManager = new BlogCommunicationsEncoder();
-print $blogManager->getHeaderText();
-print $blogManager->getAppointmentEncoder()->encode();
-print $blogManager->getTtdEncoder()->encode();
-print $blogManager->getContactEncoder()->encode();
-print $blogManager->getFooterText();
+$commsMgr = AppointmentConfig::getInstance()->getCommunicationsManager();
+// $blogManager = new BlogCommunicationsManager();
+print $commsMgr->getHeaderText();
+print $commsMgr->getAppointmentEncoder()->encode();
+print $commsMgr->getTtdEncoder()->encode();
+print $commsMgr->getContactEncoder()->encode();
+print $commsMgr->getFooterText();
 
 print PHP_EOL;
 
-$megaManager = new MegaCommunicationsManager();
+/*$megaManager = new MegaCommunicationsManager();
 print $megaManager->getHeaderText();
 print $megaManager->getAppointmentEncoder()->encode();
 print $megaManager->getTtdEncoder()->encode();
 print $megaManager->getContactEncoder()->encode();
-print $megaManager->getFooterText();
+print $megaManager->getFooterText();*/
