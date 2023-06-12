@@ -1,44 +1,67 @@
 <?php
 
-class AppointmentSettings
+class ObjectAssembler
 {
-    public static $COMSTYPE = 'Blog';
+    private array $components = [];
+
+    public function __construct(string $conf)
+    {
+        $this->configure($conf);
+    }
+
+    private function configure(string $conf): void
+    {
+
+        $data = require_once $conf;
+
+        foreach ($data as $object) {
+            $args = [];
+            $name = $object['name'];
+
+            foreach ($object['args'] as $arg) {
+                $argclass = $arg;
+                $args[] = $argclass;
+            }
+
+            $this->components[$name] = function () use ($name, $args) {
+                $expandedArgs = [];
+                foreach ($args as $arg) {
+                    $expandedArgs[] = new $arg();
+                }
+                $rclass = new \ReflectionClass($name);
+                return $rclass->newInstanceArgs($expandedArgs);
+            };
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getComponent(string $class)
+    {
+        if (! isset($this->components[$class])) {
+            throw new \Exception("Unknown component: `$class`");
+        }
+
+        return $this->components[$class]();
+    }
 }
 
-class AppointmentConfig
+class AppointmentMaker
 {
-    private static $instance;
-    private $commsManager;
+    private AppointmentEncoder $encoder;
 
-    private function __construct()
+    public function __construct(AppointmentEncoder $encoder)
     {
-        // will run only once
-        $this->init();
+        $this->encoder = $encoder;
     }
 
-    private function init()
+    /**
+     * @return string
+     */
+    public function makeAppointment(): string
     {
-        switch (AppointmentSettings::$COMSTYPE) {
-            case 'Mega';
-                $this->commsManager = new MegaCommunicationsManager();
-                break;
-            default:
-                $this->commsManager = new BlogCommunicationsManager();
-        }
-    }
-
-    public static function getInstance(): AppointmentConfig
-    {
-        if (empty(self::$instance)) {
-            self::$instance = new self;
-        }
-
-        return self::$instance;
-    }
-
-    public function getCommunicationsManager(): CommunicationsManager
-    {
-        return $this->commsManager;
+        return $this->encoder->encode();
     }
 }
 
@@ -169,15 +192,30 @@ class MegaContactEncoder extends ContactEncoder
     }
 }
 
-$commsMgr = AppointmentConfig::getInstance()->getCommunicationsManager();
+// Version 2: Dependency Injection approach
+$assembler = new ObjectAssembler(__DIR__ . '/config/appointments.php');
+
+try {
+    $apptMaker = $assembler->getComponent('AppointmentMaker');
+    $commsMgr  = $assembler->getComponent('BlogCommunicationsManager');
+} catch (\Exception $e) {
+    exit($e->getMessage() . PHP_EOL);
+}
+
+print $commsMgr->getHeaderText();
+print $apptMaker->makeAppointment();
+print $commsMgr->getFooterText();
+
+print PHP_EOL;
+
+// Version 1: Service Locator and Prototype approach
+/*$commsMgr = AppointmentConfig::getInstance()->getCommunicationsManager();
 // $blogManager = new BlogCommunicationsManager();
 print $commsMgr->getHeaderText();
 print $commsMgr->getAppointmentEncoder()->encode();
 print $commsMgr->getTtdEncoder()->encode();
 print $commsMgr->getContactEncoder()->encode();
-print $commsMgr->getFooterText();
-
-print PHP_EOL;
+print $commsMgr->getFooterText();*/
 
 /*$megaManager = new MegaCommunicationsManager();
 print $megaManager->getHeaderText();
