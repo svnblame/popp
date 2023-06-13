@@ -1,26 +1,53 @@
 <?php
+declare(strict_types=1);
 
 abstract class Unit
 {
-    /**
-     * @throws UnitException
-     */
-    public function addUnit(Unit $unit)
+    public function getComposite()
     {
-        throw new UnitException(get_class($this) . " is a leaf");
+        return null;
     }
 
-    /**
-     * @throws UnitException
-     */
-    public function removeUnit(Unit $unit)
-    {
-        throw new UnitException(get_class($this) . " is a leaf.");
-    }
     abstract public function bombardStrength(): int;
 }
 
-class UnitException extends Exception {}
+class UnitException extends \Exception {}
+
+abstract class CompositeUnit extends Unit
+{
+    private array $units = [];
+
+    /**
+     * @return CompositeUnit
+     */
+    public function getComposite(): CompositeUnit
+    {
+        return $this;
+    }
+
+    public function addUnit(Unit $unit): void
+    {
+        if (in_array($unit, $this->units, true)) {
+            return;
+        }
+
+        $this->units[] = $unit;
+    }
+
+    public function removeUnit(Unit $unit): void
+    {
+        $idx = array_search($unit, $this->units, true);
+
+        if (is_int($idx)) {
+            array_splice($this->units, $idx, 1, []);
+        }
+    }
+
+    public function getUnits(): array
+    {
+        return $this->units;
+    }
+}
 
 class Archer extends Unit
 {
@@ -38,33 +65,38 @@ class LaserCannonUnit extends Unit
     }
 }
 
-class Army extends Unit
+class Cavalry extends Unit
 {
-    private $units = [];
-
-    public function addUnit(Unit $unit): void
+    public function bombardStrength(): int
     {
-        if (in_array($unit, $this->units, true)) {
-            return;
-        }
-
-        $this->units[] = $unit;
+        return 3;
     }
+}
 
-    public function removeUnit(Unit $unit)
+class Soldier extends Unit
+{
+    public function bombardStrength(): int
     {
-        $idx = array_search($unit, $this->units, true);
-
-        if (is_int($idx)) {
-            array_splice($this->units, $idx, 1, []);
-        }
+        return 8;
     }
+}
+
+class Tank extends Unit
+{
+    public function bombardStrength(): int
+    {
+        return 4;
+    }
+}
+
+class Army extends CompositeUnit
+{
 
     public function bombardStrength(): int
     {
         $ret = 0;
 
-        foreach ($this->units as $unit) {
+        foreach ($this->getUnits() as $unit) {
             $ret += $unit->bombardStrength();
         }
 
@@ -72,25 +104,70 @@ class Army extends Unit
     }
 }
 
-// create an army
-$main_army = new Army();
+class TroopCarrier extends CompositeUnit
+{
+    public function addUnit(Unit $unit): void
+    {
+        if ($unit instanceof Cavalry) {
+            throw new UnitException("Can't get a horse on the vehicle");
+        }
 
-// add some units
-$main_army->addUnit(new Archer());
-$main_army->addUnit(new LaserCannonUnit());
+        parent::addUnit($unit);
+    }
 
-// create another army
-$sub_army = new Army();
+    public function bombardStrength(): int
+    {
+        return 0;
+    }
+}
 
-// add some units
-$sub_army->addUnit(new Archer());
-$sub_army->addUnit(new Archer());
-$sub_army->addUnit(new Archer());
+class UnitScript
+{
+    public static function joinExisting(Unit $newUnit, Unit $occupyingUnit): CompositeUnit
+    {
+        $comp = $occupyingUnit->getComposite();
 
-// add the second army to the first
-$main_army->addUnit($sub_army);
+        if (! is_null($comp)) {
+            $comp->addUnit($newUnit);
+        } else {
+            $comp = new Army();
+            $comp->addUnit($occupyingUnit);
+            $comp->addUnit($newUnit);
+        }
 
-// all  the calculations handled behind the scenes
-print "Attacking with strength: {$main_army->bombardStrength()}" . PHP_EOL;
+        return $comp;
+    }
+}
 
-print PHP_EOL;
+class Runner
+{
+    public static function run(): void
+    {
+        $army1 = new Army;
+        $army1->addUnit(new Archer);
+        $army1->addUnit(new Archer);
+
+        $army2 = new Army;
+        $army2->addUnit(new Archer);
+        $army2->addUnit(new Archer);
+        $army2->addUnit(new LaserCannonUnit);
+        $army2->addUnit(new Soldier);
+
+        $composite = UnitScript::joinExisting($army2, $army1);
+        print_r($composite);
+        print "Combined Bombard Strength: " . $composite->bombardStrength();
+
+        print PHP_EOL . PHP_EOL;
+
+        // Demonstrate UnitException
+        $troopCarrier = new TroopCarrier();
+
+        try {
+            $troopCarrier->addUnit(new Cavalry);
+        } catch (UnitException $e) {
+            exit($e->getMessage() . PHP_EOL);
+        }
+    }
+}
+
+Runner::run();
