@@ -1,6 +1,47 @@
 <?php
 declare(strict_types=1);
 
+abstract class Tile
+{
+    abstract public function getWealthFactor(): int;
+}
+
+abstract class TileDecorator extends Tile 
+{
+    protected $tile;
+
+    public function __construct(Tile $tile)
+    {
+        $this->tile = $tile;
+    }
+}
+
+class Plains extends Tile
+{
+    private $wealthFactor = 2;
+
+    public function getWealthFactor(): int
+    {
+        return $this->wealthFactor;
+    }
+}
+
+class DiamondDecorator extends TileDecorator
+{
+    public function getWealthFactor(): int
+    {
+        return $this->tile->getWealthFactor() + 2;
+    }
+}
+
+class PollutedDecorator extends TileDecorator
+{
+    public function getWealthFactor(): int
+    {
+        return $this->tile->getWealthFactor() - 4;
+    }
+}
+
 abstract class Unit
 {
     public function getComposite()
@@ -170,4 +211,13 @@ class Runner
     }
 }
 
-Runner::run();
+// Runner::run();
+
+$tile = new Plains();
+print $tile->getWealthFactor() . PHP_EOL;  // 2
+
+$tile2 = new DiamondDecorator(new Plains());
+print $tile2->getWealthFactor() . PHP_EOL;  // 4
+
+$tile3 = new PollutedDecorator(new DiamondDecorator(new Plains()));
+print $tile3->getWealthFactor() . PHP_EOL;  // 0
