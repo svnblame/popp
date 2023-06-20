@@ -1,0 +1,4 @@
+123-ladies_jumper 55
+234-gents_hat 44
+345-ladies_panties 22
+456-gents_pants 78
