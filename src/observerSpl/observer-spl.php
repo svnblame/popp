@@ -1,5 +1,7 @@
 <?php
 
+namespace Spl;
+
 interface Observable
 {
     public function attach(Observer $observer);
@@ -68,9 +70,11 @@ class PartnershipTool extends LoginObserver
     }
 }
 
-class Login implements Observable
+class Login implements \SplSubject
 {
     private $observers = [];
+
+    private $storage;
 
     private $status;
 
@@ -80,24 +84,24 @@ class Login implements Observable
     const LOGIN_WRONG_PASS = 2;
     const LOGIN_ACCESS = 3;
 
-    public function attach(Observer $observer)
+    public function __construct()
     {
-        $this->observers[] = $observer;
+        $this->storage = new \SplObjectStorage;
     }
 
-    public function detach(Observer $observer)
+    public function attach(\SplObserver $observer)
     {
-        $this->observers = array_filter(
-            $this->observers,
-            function ($a) use ($observer) {
-                return (! ($a === $observer));
-            }
-        );
+        $this->storage->attach($observer);
+    }
+
+    public function detach(\SplObserver $observer)
+    {
+        $this->storage->detach($observer);
     }
 
     public function notify()
     {
-        foreach ($this->observers as $obs) {
+        foreach ($this->storage as $obs) {
             $obs->update($this);
         }
     }
