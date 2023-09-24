@@ -82,8 +82,8 @@ if (! file_exists($productsData)) {
 
 $products = Products::get();
 
-print_r($products) . PHP_EOL;
+products . phpprint_r($products) . PHP_EOL;
 
 $product345 = Products::get('345');
 
-print_r($product345) . PHP_EOL;
+products . phpprint_r($product345) . PHP_EOL;
