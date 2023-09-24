@@ -1,14 +1,15 @@
-version: '3.8'
+version: '3.9'
 services:
-  popp:
-    image: popp-image
+  popp-nginx:
+    image: nginx:latest
     ports:
-      - '80:80'
-    #    volumes:
-    #      - ./src :/var/www/html
-    environment:
-      MYSQL_DB_CONNECTION: test
-      MYSQL_DB_NAME: test
-      MYSQL_DB_USER: test
-      MYSQL_DB_PASSWORD: test
-      SITE_URL: http://localhost
+      - '8080:80'
+    volumes:
+      - ./src:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - popp-php-fpm
+  popp-php-fpm:
+    image: php:8-fpm
+    volumes:
+      - ./src:/var/www/html
