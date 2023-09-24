@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  popp:
+    image: popp-image
+    ports:
+      - '80:80'
+    #    volumes:
+    #      - ./src :/var/www/html
+    environment:
+      MYSQL_DB_CONNECTION: test
+      MYSQL_DB_NAME: test
+      MYSQL_DB_USER: test
+      MYSQL_DB_PASSWORD: test
+      SITE_URL: http://localhost
