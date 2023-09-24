@@ -202,9 +202,9 @@ try {
     exit($e->getMessage() . PHP_EOL);
 }
 
-print $commsMgr->getHeaderText();
-print $apptMaker->makeAppointment();
-print $commsMgr->getFooterText();
+echo '<p>' . $commsMgr->getHeaderText() . '</p>';
+echo '<p>' . $apptMaker->makeAppointment() . '</p>';
+echo '<p>' . $commsMgr->getFooterText() . '</p>';
 
 print PHP_EOL;
 
