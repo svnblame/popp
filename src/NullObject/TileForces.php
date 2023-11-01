@@ -23,7 +23,7 @@ class TileForces
     public function __construct(int $x, int $y, UnitAcquisition $acquisition)
     {
         $this->x = $x;
-        $this->y = $y;   // @todo Should this be = $x??
+        $this->y = $y;
         $this->units = $acquisition->getUnits($this->x, $this->y);
     }
 
@@ -32,9 +32,7 @@ class TileForces
         $power = 0;
 
         foreach ($this->units as $unit) {
-            if (! is_null($unit)) {
-                $power += $unit->bombardStrength();
-            }
+            $power += $unit->bombardStrength();
         }
 
         return $power;
@@ -45,9 +43,7 @@ class TileForces
         $health = 0;
 
         foreach ($this->units as $unit) {
-            if (! is_null($unit)) {
-                $health += $unit->getHealth();
-            }
+            $health += $unit->getHealth();
         }
 
         return $health;
