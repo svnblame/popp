@@ -23,7 +23,7 @@ class TileForces
     public function __construct(int $x, int $y, UnitAcquisition $acquisition)
     {
         $this->x = $x;
-        $this->y = $y;   // @todo Should this be = $x??
+        $this->y = $x;
         $this->units = $acquisition->getUnits($this->x, $this->y);
     }
 
