@@ -7,6 +7,7 @@ use POPP\Visitor\Army;
 use POPP\Visitor\Archer;
 use POPP\Visitor\Cavalry;
 use POPP\Visitor\LaserCannonUnit;
+use POPP\Visitor\NullUnit;
 
 class UnitAcquisition
 {
@@ -20,7 +21,7 @@ class UnitAcquisition
         $army->addUnit(new Archer());
         return [
             new Cavalry(),
-            null,
+            new NullUnit(),
             new LaserCannonUnit(),
             $army
         ];
