@@ -10,7 +10,12 @@ class Runner
      */
     public static function run()
     {
-        $reg = Registry::instance();
-        print_r($reg->getRequest());
+        $registry = Registry::instance();
+        $registry->set('request', new Request);
+
+        $registry = Registry::instance();
+        print_r($registry->get('request'));
+
+        print PHP_EOL;
     }
 }
