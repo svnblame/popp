@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace POPP\Registry;
 
+#[\AllowDynamicProperties]
 class Registry
 {
     private static $instance = null;
@@ -19,13 +20,17 @@ class Registry
         return self::$instance;
     }
 
-    public function getRequest(): Request
+    public function get(string $key)
     {
-        if (is_null($this->request)) {
-            $this->request = new Request;
+        if (isset($this->values[$key])) {
+            return $this->values[$key];
         }
 
-        return $this->request;
+        return null;
     }
 
+    public function set(string $key, $value)
+    {
+        $this->values[$key] = $value;
+    }
 }
