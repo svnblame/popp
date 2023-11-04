@@ -11,10 +11,21 @@ class Runner
     public static function run()
     {
         $registry = Registry::instance();
-        $registry->set('request', new Request);
+        $registry2 = Registry::instance();
+        print_r($registry2->getRequest());
+        print PHP_EOL;
+        print_r($registry2->treeBuilder());
+        print PHP_EOL;
 
-        $registry = Registry::instance();
-        print_r($registry->get('request'));
+        Registry::testMode();
+        $mockRegistry = Registry::instance();
+        print_r($mockRegistry);
+        print PHP_EOL;
+
+        Registry::testMode(false);
+
+        $registry3 = Registry::instance();
+        print_r($registry3);
 
         print PHP_EOL;
     }
