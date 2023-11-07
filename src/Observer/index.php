@@ -1,5 +1,7 @@
 <?php
 
+namespace POPP\Observer;
+
 require_once __DIR__ . '/../bootstrap.php';
 
 use POPP\Observer\Authentication\Login;

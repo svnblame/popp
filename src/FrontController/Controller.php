@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace POPP\FrontController;
 
+use Exception;
+
 class Controller
 {
     private Registry $registry;
@@ -12,19 +14,32 @@ class Controller
         $this->registry = Registry::instance();
     }
 
-    public static function run()
+    /**
+     * @return void
+     * @throws AppException
+     * @throws Exception
+     */
+    public static function run(): void
     {
         $instance = new Controller;
         $instance->init();
         $instance->handleRequest();
     }
 
-    private function init()
+    /**
+     * @return void
+     * @throws AppException
+     */
+    private function init(): void
     {
         $this->registry->getApplicationHelper()->init();
     }
 
-    private function handleRequest()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function handleRequest(): void
     {
         $request = $this->registry->getRequest();
         $resolver = new CommandResolver;
